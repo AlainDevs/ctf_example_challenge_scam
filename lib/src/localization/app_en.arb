@@ -1,0 +1,6 @@
+{
+  "appTitle": "ctf_example_challenge_scam",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
