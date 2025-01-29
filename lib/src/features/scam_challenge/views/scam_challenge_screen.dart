@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/scam_challenge_viewmodel.dart';
+import '../../../core/animations/animated_content.dart';
 import 'social_post_view.dart';
 import 'info_collection_view.dart';
 import 'warning_view.dart';
@@ -19,14 +20,14 @@ class ScamChallengeScreen extends StatelessWidget {
         ),
         body: Consumer<ScamChallengeViewModel>(
           builder: (context, viewModel, child) {
-            switch (viewModel.currentStep) {
-              case ScamChallengeStep.socialPost:
-                return const SocialPostView();
-              case ScamChallengeStep.infoCollection:
-                return const InfoCollectionView();
-              case ScamChallengeStep.warning:
-                return const WarningView();
-            }
+            return AnimatedContent(
+              key: ValueKey(viewModel.currentStep),
+              child: switch (viewModel.currentStep) {
+                ScamChallengeStep.socialPost => const SocialPostView(),
+                ScamChallengeStep.infoCollection => const InfoCollectionView(),
+                ScamChallengeStep.warning => const WarningView(),
+              },
+            );
           },
         ),
       ),

@@ -10,14 +10,73 @@ class InfoCollectionView extends StatefulWidget {
   State<InfoCollectionView> createState() => _InfoCollectionViewState();
 }
 
-class _InfoCollectionViewState extends State<InfoCollectionView> {
+class _InfoCollectionViewState extends State<InfoCollectionView> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
+  
+  late final AnimationController _controller;
+  late final Animation<double> _titleAnimation;
+  late final Animation<double> _nameFieldAnimation;
+  late final Animation<double> _addressFieldAnimation;
+  late final Animation<double> _phoneFieldAnimation;
+  late final Animation<double> _submitButtonAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _titleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.2, curve: Curves.easeOut),
+    ));
+
+    _nameFieldAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.2, 0.4, curve: Curves.easeOut),
+    ));
+
+    _addressFieldAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.4, 0.6, curve: Curves.easeOut),
+    ));
+
+    _phoneFieldAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.6, 0.8, curve: Curves.easeOut),
+    ));
+
+    _submitButtonAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.8, 1.0, curve: Curves.elasticOut),
+    ));
+
+    _controller.forward();
+  }
 
   @override
   void dispose() {
+    _controller.dispose();
     _nameController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
@@ -33,59 +92,91 @@ class _InfoCollectionViewState extends State<InfoCollectionView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Claim Your Free iPhone 15 Pro Max!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            FadeTransition(
+              opacity: _titleAnimation,
+              child: const Text(
+                'Claim Your Free iPhone 15 Pro Max!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 20),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Full Name',
-                border: OutlineInputBorder(),
+            FadeTransition(
+              opacity: _nameFieldAnimation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(-0.2, 0),
+                  end: Offset.zero,
+                ).animate(_nameFieldAnimation),
+                child: TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Full Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your name';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _addressController,
-              decoration: const InputDecoration(
-                labelText: 'Shipping Address',
-                border: OutlineInputBorder(),
+            FadeTransition(
+              opacity: _addressFieldAnimation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.2, 0),
+                  end: Offset.zero,
+                ).animate(_addressFieldAnimation),
+                child: TextFormField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Shipping Address',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your address';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your address';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                border: OutlineInputBorder(),
+            FadeTransition(
+              opacity: _phoneFieldAnimation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(-0.2, 0),
+                  end: Offset.zero,
+                ).animate(_phoneFieldAnimation),
+                child: TextFormField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              keyboardType: TextInputType.phone,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your phone number';
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
+            ScaleTransition(
+              scale: _submitButtonAnimation,
+              child: ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   final userInfo = UserInfo(
@@ -113,6 +204,7 @@ class _InfoCollectionViewState extends State<InfoCollectionView> {
                 ),
               ),
             ),
+          ),
           ],
         ),
       ),
